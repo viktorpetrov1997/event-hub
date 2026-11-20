@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Events | EventHub</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/events.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+
+        <a class="brand" href="#">
+            <span class="brand-mark">E</span>
+            <span>EventHub</span>
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Events</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Venues</a></li>
+            <li><a href="#">+ New Event</a></li>
+            <li class="nav-user">
+                <span class="who">user</span>
+
+                <span class="badge badge-primary">ORGANIZER</span>
+
+                <form action="#" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+
+        <div class="page-header">
+            <div>
+                <h1>Upcoming events</h1>
+                <p>Find a workshop or event and reserve your seat.</p>
+            </div>
+            <a href="#" class="btn btn-primary">+ New event </a>
+        </div>
+
+        <form class="filter-bar" action="#" method="get">
+
+            <div class="form-group">
+                <label for="search">Search</label>
+                <input type="text" id="search" name="search" placeholder="Title or keyword">
+            </div>
+
+            <div class="form-group">
+                <label for="venueId">Venue</label>
+                <select id="venueId" name="venueId">
+                    <option value="">All venues</option>
+                    <option value="1">Sofia Open Air Festival Grounds – Sofia</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Filter</button>
+
+            <a href="#" class="btn btn-secondary">Reset</a>
+
+        </form>
+
+        <div class="event-grid">
+
+            <article class="card card-hover event-card">
+
+                <div class="banner">August 8th 2027</div>
+
+                <div class="body">
+                    <h3><a href="#">Summer Music Festival 2027</a></h3>
+
+                    <div style="margin-bottom:.6rem;">
+                        <span class="badge badge-warning">Hidden</span>
+                        <span class="badge badge-danger">Sold out</span>
+                    </div>
+
+                    <ul class="event-meta">
+                        <li>
+                            <i class="bi bi-clock"></i>
+                            <span>18:00 – 23:00</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-geo-alt"></i>
+                            <span>Sofia Open Air Festival Grounds, Sofia</span>
+                        </li>
+                    </ul>
+
+                    <div class="seats">
+                        <div class="seats-label">
+                            <span>Seats</span>
+                            <span>5 / 100</span>
+                        </div>
+                        <div class="seats-bar">
+                            <span style="width: 5%"></span>
+                        </div>
+                    </div>
+
+                    <div class="footer-row">
+                        <span class="price">€15.00</span>
+                        <a href="#" class="btn btn-outline btn-sm">View details</a>
+                    </div>
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        &copy; 2026 EventHub &middot; Event Booking &amp; Management Platform
+    </div>
+</footer>
+
+</body>
+</html>

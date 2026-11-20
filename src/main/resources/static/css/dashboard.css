@@ -1,0 +1,58 @@
+.stat-grid
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card
+{
+    padding: 1.25rem 1.5rem;
+}
+
+.stat-card .stat-label
+{
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+
+.stat-card .stat-value
+{
+    margin-top: 0.25rem;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #3730a3;
+}
+
+.stat-card.accent
+{
+    border-left: 4px solid #f59e0b;
+}
+
+.stat-card.primary
+{
+    border-left: 4px solid #4338ca;
+}
+
+.stat-card.success
+{
+    border-left: 4px solid #15803d;
+}
+
+.section-title
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 2rem 0 1rem;
+}
+
+.section-title h2
+{
+    margin: 0;
+}

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Venue form | EventHub</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/events.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+
+        <a class="brand" href="#">
+            <span class="brand-mark">E</span>
+            <span>EventHub</span>
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Events</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Venues</a></li>
+            <li><a href="#">+ New Event</a></li>
+            <li class="nav-user">
+                <span class="who">user</span>
+
+                <span class="badge badge-primary">ORGANIZER</span>
+
+                <form action="#" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+
+        <div class="card form-card">
+            <h1>Add a venue</h1>
+
+            <form action="#" method="post">
+
+                <div class="form-group">
+                    <label for="name">Venue name</label>
+                    <input type="text" id="name" placeholder="e.g. NDK (National Palace of Culture)">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" placeholder="e.g. Sofia">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="capacity">Capacity</label>
+                        <input type="number" id="capacity" min="1" placeholder="e.g. 100">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" placeholder="Street and number">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Create venue</button>
+                    <a href="#" class="btn btn-secondary">Cancel</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        &copy; 2026 EventHub &middot; Event Booking &amp; Management Platform
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My bookings | EventHub</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/events.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+
+        <a class="brand" href="#">
+            <span class="brand-mark">E</span>
+            <span>EventHub</span>
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Events</a></li>
+            <li><a href="#">My Bookings</a></li>
+            <li class="nav-user">
+                <span class="who">user</span>
+
+                <span class="badge badge-primary">ATTENDEE</span>
+
+                <form action="#" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+
+        <div class="page-header">
+            <div>
+                <h1>My bookings</h1>
+                <p>All the events you have reserved seats for.</p>
+            </div>
+            <a href="#" class="btn btn-primary">Browse events</a>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Date</th>
+                    <th>Seats</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><a href="#">Summer Music Festival 2027</a></td>
+
+                    <td>August 8th 2027, 18:00</td>
+
+                    <td>2</td>
+
+                    <td>75.00 €</td>
+
+                    <td>
+                        <span class="badge badge-success">CONFIRMED</span>
+                    </td>
+
+                    <td>
+                        <div class="actions">
+                            <a href="#" class="btn btn-secondary btn-sm">View</a>
+
+                            <form action="#" method="put" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+
+                                <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                            </form>
+
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        &copy; 2026 EventHub &middot; Event Booking &amp; Management Platform
+    </div>
+</footer>
+
+</body>
+</html>

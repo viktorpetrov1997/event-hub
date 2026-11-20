@@ -1,0 +1,222 @@
+.filter-bar
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+.filter-bar .form-group
+{
+    margin: 0;
+    flex: 1 1 180px;
+}
+
+.event-grid
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+}
+
+.event-card
+{
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+}
+
+.event-card .banner
+{
+    display: flex;
+    align-items: flex-end;
+    height: 90px;
+    padding: 0.8rem 1.25rem;
+    background: linear-gradient(135deg, #4338ca, #818cf8);
+    color: #fff;
+    font-weight: 600;
+}
+
+.event-card .body
+{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.25rem;
+}
+
+.event-card h3
+{
+    margin-bottom: 0.4rem;
+}
+
+.event-meta
+{
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
+    font-size: 0.92rem;
+    color: #6b7280;
+}
+
+.event-meta li
+{
+    margin-bottom: 0.25rem;
+}
+
+.event-meta li i
+{
+    margin-right: 0.3rem;
+    color: #4338ca;
+}
+
+.event-card .footer-row
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: auto;
+}
+
+.price
+{
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #3730a3;
+}
+
+.seats
+{
+    margin-bottom: 1rem;
+}
+
+.seats-label
+{
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin-bottom: 0.3rem;
+}
+
+.seats-bar
+{
+    height: 8px;
+    border-radius: 999px;
+    background: #e5e7eb;
+    overflow: hidden;
+}
+
+.seats-bar > span
+{
+    display: block;
+    height: 100%;
+    background: #4338ca;
+    border-radius: 999px;
+}
+
+.seats-bar > span.full
+{
+    background: #dc2626;
+}
+
+.details-layout
+{
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.details-main h1
+{
+    margin-bottom: 0.75rem;
+}
+
+.details-main .description
+{
+    white-space: pre-line;
+    margin-top: 1rem;
+}
+
+.info-list
+{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.info-list li
+{
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.info-list li:last-child
+{
+    border-bottom: none;
+}
+
+.info-list .label
+{
+    color: #6b7280;
+}
+
+.booking-box
+{
+    position: sticky;
+    top: calc(64px + 1rem);
+}
+
+.booking-box .price
+{
+    display: block;
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+}
+
+.booking-box form
+{
+    margin-top: 1rem;
+}
+
+.form-card
+{
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.form-card h1
+{
+    margin-bottom: 1.5rem;
+}
+
+.inline-form
+{
+    display: inline;
+    margin: 0;
+}
+
+@media (max-width: 860px)
+{
+    .details-layout
+    {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-box
+    {
+        position: static;
+    }
+}

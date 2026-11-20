@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Event form | EventHub</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/events.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+
+        <a class="brand" href="#">
+            <span class="brand-mark">E</span>
+            <span>EventHub</span>
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Events</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Venues</a></li>
+            <li><a href="#">+ New Event</a></li>
+            <li class="nav-user">
+                <span class="who">user</span>
+
+                <span class="badge badge-primary">ORGANIZER</span>
+
+                <form action="#" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+
+        <div class="card form-card">
+
+            <h1>Create a new event</h1>
+
+            <form action="#" method="post">
+
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" placeholder="e.g. Web Development Hackathon 2027">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" placeholder="What will attendees learn or experience?"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="startTime">Starts</label>
+                        <input type="datetime-local" id="startTime" name="startTime">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="endTime">Ends</label>
+                        <input type="datetime-local" id="endTime" name="endTime">
+                    </div>
+                </div>
+
+                <div class="form-group">
+
+                    <label for="venueId">Venue</label>
+
+                    <select id="venueId" name="venueId">
+                        <option value="">-- Select a venue --</option>
+                        <option value="1">Sofia Open Air Festival Grounds – Sofia (capacity 100)</option>
+                    </select>
+
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="price">Price (€)</label>
+                        <input type="number" id="price" name="price" step="1" min="0" placeholder="0.00">
+                        <div class="hint">Use 0 for a free event.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="capacity">Capacity (seats)</label>
+                        <input type="number" id="capacity" name="capacity" step="1" min="1" placeholder="e.g. 50">
+                        <div class="hint">Cannot exceed the venue capacity.</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:.5rem;font-weight:500;">
+                        <input type="checkbox" name="published" style="width:auto;" checked>
+                        Publish immediately (visible to attendees)
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Create event</button>
+
+                    <a href="#" class="btn btn-secondary">Cancel</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        &copy; 2026 EventHub &middot; Event Booking &amp; Management Platform
+    </div>
+</footer>
+
+</body>
+</html>

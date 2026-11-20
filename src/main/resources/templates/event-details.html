@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Event details | EventHub</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/events.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+
+        <a class="brand" href="#">
+            <span class="brand-mark">E</span>
+            <span>EventHub</span>
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Events</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Venues</a></li>
+            <li><a href="#">+ New Event</a></li>
+            <li class="nav-user">
+                <span class="who">user</span>
+
+                <span class="badge badge-primary">ORGANIZER</span>
+
+                <form action="#" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+
+        <p><a href="#">&larr Back to events</a></p>
+
+        <div class="details-layout">
+
+            <section class="card details-main">
+                <div style="margin-bottom:.75rem;">
+                    <span class="badge badge-success">Published</span>
+                    <span class="badge badge-warning">Hidden</span>
+                    <span class="badge badge-danger">Sold out</span>
+                </div>
+
+                <h1>Summer Music Festival 2027</h1>
+                <p class="muted">Organized by <strong>user</strong></p>
+
+                <h3 style="margin-top:1.5rem;">About this event</h3>
+                <p class="description">Enjoy an unforgettable summer night filled with live music, amazing artists, great vibes, and dancing under the stars. Join us for the ultimate summer festival experience!</p>
+
+                <h3 style="margin-top:1.5rem;">Details</h3>
+                <ul class="info-list">
+                    <li><span class="label">Date</span><span>August 8th 2027</span></li>
+                    <li><span class="label">Starts</span><span>18:00</span></li>
+                    <li><span class="label">Ends</span><span>23:00</span></li>
+                    <li><span class="label">Venue</span><span>Sofia Open Air Festival Grounds</span></li>
+                    <li><span class="label">City</span><span>Sofia</span></li>
+                    <li><span class="label">Address</span><span>Borisova Gradina, bul. Dragan Tsankov, 1164 Sofia, Bulgaria.</span></li>
+                    <li><span class="label">Capacity</span><span>100</span></li>
+                    <li><span class="label">Seats left</span><strong>95</strong></li>
+                </ul>
+            </section>
+
+            <aside class="card booking-box">
+
+                <span class="price">15.00 €</span>
+
+                <form action="#" method="post">
+
+                    <div class="form-group">
+                        <label for="seats">Number of seats</label>
+                        <input type="number" id="seats" name="seats" min="1" max="100">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">Book now</button>
+
+                </form>
+            </aside>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        &copy; 2026 EventHub &middot; Event Booking &amp; Management Platform
+    </div>
+</footer>
+
+</body>
+</html>
