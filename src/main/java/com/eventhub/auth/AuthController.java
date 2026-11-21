@@ -1,9 +1,13 @@
 package com.eventhub.auth;
 
 import com.eventhub.user.UserService;
+import com.eventhub.user.dto.UserDto;
+import com.eventhub.user.dto.UserLoginRequest;
 import com.eventhub.user.dto.UserRegisterRequest;
+import com.eventhub.user.exception.InvalidLoginException;
 import com.eventhub.user.exception.UserAlreadyExistsException;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -57,5 +61,55 @@ public class AuthController
         }
 
         return new ModelAndView("redirect:/login");
+    }
+
+    @GetMapping("/login")
+    public ModelAndView getLoginPage()
+    {
+        UserLoginRequest userLoginRequest = new UserLoginRequest();
+
+        ModelAndView modelAndView = new ModelAndView("login");
+        modelAndView.addObject("userLoginRequest", userLoginRequest);
+
+        return modelAndView;
+    }
+
+    @PostMapping("/login")
+    public ModelAndView login(@Valid UserLoginRequest userLoginRequest,
+                              BindingResult bindingResult,
+                              HttpSession httpSession
+    )
+    {
+        if(bindingResult.hasErrors())
+        {
+            ModelAndView modelAndView = new ModelAndView("login");
+            modelAndView.addObject("userLoginRequest", userLoginRequest);
+            return modelAndView;
+        }
+
+        try
+        {
+            UserDto user = userService.login(userLoginRequest);
+
+            httpSession.setAttribute("user_id", user.getId());
+            httpSession.setAttribute("user_role", user.getRole().name());
+            httpSession.setAttribute("username", user.getUsername());
+
+            return new ModelAndView("redirect:/");
+        }
+        catch(InvalidLoginException ex)
+        {
+            ModelAndView modelAndView = new ModelAndView("login");
+            modelAndView.addObject("userLoginRequest", userLoginRequest);
+            modelAndView.addObject("errorMessage", ex.getMessage());
+            return modelAndView;
+        }
+    }
+
+    @PostMapping("/logout")
+    public ModelAndView logout(HttpSession httpSession)
+    {
+        httpSession.invalidate();
+        return new ModelAndView("redirect:/");
     }
 }

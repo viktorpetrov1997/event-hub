@@ -1,11 +1,15 @@
 package com.eventhub.user;
 
 import com.eventhub.user.dto.UserDto;
+import com.eventhub.user.dto.UserLoginRequest;
 import com.eventhub.user.dto.UserRegisterRequest;
+import com.eventhub.user.exception.InvalidLoginException;
 import com.eventhub.user.exception.UserAlreadyExistsException;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UserService
@@ -34,5 +38,19 @@ public class UserService
         User savedUser = userRepository.save(user);
 
         return UserMapper.toUserDto(savedUser);
+    }
+
+    public UserDto login(UserLoginRequest userLoginRequest)
+    {
+        Optional<User> optionalUser = userRepository.findByEmail(userLoginRequest.getEmail());
+
+        if(optionalUser.isEmpty() ||
+                !passwordEncoder.matches(userLoginRequest.getPassword(), optionalUser.get().getPassword())
+        )
+        {
+            throw new InvalidLoginException("Invalid email or password!");
+        }
+
+        return UserMapper.toUserDto(optionalUser.get());
     }
 }
