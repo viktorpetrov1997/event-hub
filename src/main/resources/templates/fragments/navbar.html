@@ -1,0 +1,56 @@
+<nav th:fragment="navbar(activePage)" class="navbar">
+    <div class="container">
+
+        <a class="brand" th:href="@{/}">
+            <span class="brand-mark">E</span>
+            <span>EventHub</span>
+        </a>
+
+        <ul class="nav-links">
+            <li><a th:href="@{/}" th:classappend="${activePage == 'index'} ? 'active'">Home</a></li>
+
+            <th:block th:if="${session.user_id == null}">
+                <li>
+                    <a th:href="@{/login}" th:classappend="${activePage == 'login'} ? 'active'">Login</a>
+                </li>
+                <li>
+                    <a th:href="@{/register}" class="btn btn-primary btn-sm">Register</a>
+                </li>
+            </th:block>
+
+            <th:block th:if="${session.user_role == 'ATTENDEE'}">
+                <li>
+                    <a th:href="@{/events}" th:classappend="${activePage == 'events'} ? 'active'">Events</a>
+                </li>
+                <li>
+                    <a th:href="@{/my-bookings}" th:classappend="${activePage == 'my-bookings'} ? 'active'">My Bookings</a>
+                </li>
+            </th:block>
+
+            <th:block th:if="${session.user_role == 'ORGANIZER'}">
+                <li>
+                    <a th:href="@{/events}" th:classappend="${activePage == 'events'} ? 'active'">Events</a>
+                </li>
+                <li>
+                    <a th:href="@{/dashboard}" th:classappend="${activePage == 'dashboard'} ? 'active'">Dashboard</a>
+                </li>
+                <li>
+                    <a th:href="@{/venues}" th:classappend="${activePage == 'venues'} ? 'active'">Venues</a>
+                </li>
+                <li>
+                    <a th:href="@{/event-form}" th:classappend="${activePage == 'event-form'} ? 'active'">+ New Event</a>
+                </li>
+            </th:block>
+
+            <li class="nav-user" th:if="${session.user_id != null}">
+                <span class="who" th:text="${session.username}">user</span>
+
+                <span class="badge badge-primary" th:text="${session.user_role}"></span>
+
+                <form th:action="@{/logout}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
