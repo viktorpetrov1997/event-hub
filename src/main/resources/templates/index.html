@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,21 +10,7 @@
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="container">
-
-        <a class="brand" href="#">
-            <span class="brand-mark">E</span>
-            <span>EventHub</span>
-        </a>
-
-        <ul class="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Login</a></li>
-            <li><a href="#" class="btn btn-primary btn-sm">Register</a></li>
-        </ul>
-    </div>
-</nav>
+<div th:replace="~{fragments/navbar :: navbar('index')}"></div>
 
 <header class="hero">
     <div class="container">
@@ -32,8 +18,13 @@
         <p>EventHub connects organizers with curious people. Browse upcoming events, reserve your seat in seconds, or publish your own event.</p>
 
         <div class="hero-actions">
-            <a href="#" class="btn btn-light">Get started</a>
-            <a href="#" class="btn btn-ghost">I already have an account</a>
+            <th:block th:if="${session.user_id == null}">
+                <a th:href="@{/register}" class="btn btn-light">Get started</a>
+                <a th:href="@{/login}" class="btn btn-ghost">I already have an account</a>
+            </th:block>
+            <th:block th:if="${session.user_id != null}">
+                <a th:href="@{/events}" class="btn btn-light">Browse events</a>
+            </th:block>
         </div>
     </div>
 </header>
@@ -93,11 +84,7 @@
     </div>
 </main>
 
-<footer class="footer">
-    <div class="container">
-        &copy; 2026 EventHub &middot; Event Booking &amp; Management Platform
-    </div>
-</footer>
+<div th:replace="~{fragments/footer :: footer}"></div>
 
 </body>
 </html>
