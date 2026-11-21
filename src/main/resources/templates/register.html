@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,21 +9,7 @@
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="container">
-
-        <a class="brand" href="#">
-            <span class="brand-mark">E</span>
-            <span>EventHub</span>
-        </a>
-
-        <ul class="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Login</a></li>
-            <li><a href="#" class="btn btn-primary btn-sm">Register</a></li>
-        </ul>
-    </div>
-</nav>
+<div th:replace="~{fragments/navbar :: navbar('')}"></div>
 
 <main>
     <div class="container">
@@ -35,62 +21,66 @@
                 <h1>Create your account</h1>
                 <p class="subtitle">It takes less than a minute.</p>
 
-                <form action="#" method="post">
+                <th:block th:replace="~{fragments/alerts :: alerts}"></th:block>
 
-                    <div class="form-group">
+                <form th:action="@{/register}" th:object="${userRegisterRequest}" method="post" novalidate>
+
+                    <div class="form-group" th:classappend="${#fields.hasErrors('username')} ? 'has-error'">
                         <label for="username">Username</label>
-                        <input type="text" id="username" name="username" placeholder="e.g. dev42">
+                        <input type="text" id="username" th:field="*{username}" placeholder="e.g. dev42">
+                        <div class="error-text" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" th:classappend="${#fields.hasErrors('email')} ? 'has-error'">
                         <label for="email">Email</label>
-                        <input type="email" id="email" name="email" placeholder="Enter your email address">
+                        <input type="email" id="email" th:field="*{email}" placeholder="Enter your email address">
+                        <div class="error-text" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" th:classappend="${#fields.hasErrors('password')} ? 'has-error'">
                         <label for="password">Password</label>
-                        <input type="password" id="password" name="password" placeholder="At least 8 characters">
+                        <input type="password" id="password" th:field="*{password}" placeholder="At least 8 characters">
+                        <div class="error-text" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" th:classappend="${#fields.hasErrors('confirmPassword')} ? 'has-error'">
                         <label for="confirmPassword">Confirm password</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repeat your password">
+                        <input type="password" id="confirmPassword" th:field="*{confirmPassword}" placeholder="Repeat your password">
+                        <div class="error-text" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                        <div class="error-text" th:if="${#fields.hasErrors('passwordMatching')}" th:errors="*{passwordMatching}"></div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" th:classappend="${#fields.hasErrors('role')} ? 'has-error'">
 
                         <label>I want to join as</label>
 
                         <div class="role-options">
                             <label class="role-option">
-                                <input type="radio" name="role" value="ATTENDEE">
+                                <input type="radio" th:field="*{role}" value="ATTENDEE">
                                 <strong>Attendee</strong>
                                 <span>Browse and book events</span>
                             </label>
                             <label class="role-option">
-                                <input type="radio" name="role" value="ORGANIZER">
+                                <input type="radio" th:field="*{role}" value="ORGANIZER">
                                 <strong>Organizer</strong>
                                 <span>Create and manage events</span>
                             </label>
                         </div>
 
+                        <div class="error-text" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-block">Register</button>
 
                 </form>
 
-                <p class="auth-footer">Already registered? <a href="#">Log in</a></p>
+                <p class="auth-footer">Already registered? <a th:href="@{/login}">Log in</a></p>
             </div>
         </div>
     </div>
 </main>
 
-<footer class="footer">
-    <div class="container">
-        &copy; 2026 EventHub &middot; Event Booking &amp; Management Platform
-    </div>
-</footer>
+<div th:replace="~{fragments/footer :: footer}"></div>
 
 </body>
 </html>
