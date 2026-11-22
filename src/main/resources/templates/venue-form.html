@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,66 +9,48 @@
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="container">
-
-        <a class="brand" href="#">
-            <span class="brand-mark">E</span>
-            <span>EventHub</span>
-        </a>
-
-        <ul class="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Events</a></li>
-            <li><a href="#">Dashboard</a></li>
-            <li><a href="#">Venues</a></li>
-            <li><a href="#">+ New Event</a></li>
-            <li class="nav-user">
-                <span class="who">user</span>
-
-                <span class="badge badge-primary">ORGANIZER</span>
-
-                <form action="#" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
-                </form>
-            </li>
-        </ul>
-    </div>
-</nav>
+<div th:replace="~{fragments/navbar :: navbar('venues')}"></div>
 
 <main>
     <div class="container">
 
         <div class="card form-card">
-            <h1>Add a venue</h1>
+            <h1 th:text="${venueId == null} ? 'Add a venue' : 'Edit venue'"></h1>
 
-            <form action="#" method="post">
+            <form th:action="${venueId == null} ? @{/venues} : @{/venues/{id}(id=${venueId})}"
+                  th:method="${venueId == null} ? 'post' : 'put'"
+                  th:object="${venueForm}" novalidate>
 
-                <div class="form-group">
+                <div class="form-group" th:classappend="${#fields.hasErrors('name')} ? 'has-error'">
                     <label for="name">Venue name</label>
-                    <input type="text" id="name" placeholder="e.g. NDK (National Palace of Culture)">
+                    <input type="text" id="name" th:field="*{name}" placeholder="e.g. Sofia Tech Park">
+                    <div class="error-text" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group">
+                    <div class="form-group" th:classappend="${#fields.hasErrors('city')} ? 'has-error'">
                         <label for="city">City</label>
-                        <input type="text" id="city" placeholder="e.g. Sofia">
+                        <input type="text" id="city" th:field="*{city}" placeholder="e.g. Sofia">
+                        <div class="error-text" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" th:classappend="${#fields.hasErrors('capacity')} ? 'has-error'">
                         <label for="capacity">Capacity</label>
-                        <input type="number" id="capacity" min="1" placeholder="e.g. 100">
+                        <input type="number" id="capacity" th:field="*{capacity}" min="1" max="100000" placeholder="e.g. 100">
+                        <div class="error-text" th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}"></div>
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" th:classappend="${#fields.hasErrors('address')} ? 'has-error'">
                     <label for="address">Address</label>
-                    <input type="text" id="address" placeholder="Street and number">
+                    <input type="text" id="address" th:field="*{address}" placeholder="Street and number">
+                    <div class="error-text" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Create venue</button>
-                    <a href="#" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary"
+                            th:text="${venueId == null} ? 'Create venue' : 'Save changes'"></button>
+                    <a th:href="@{/venues}" class="btn btn-secondary">Cancel</a>
                 </div>
 
             </form>
@@ -76,11 +58,7 @@
     </div>
 </main>
 
-<footer class="footer">
-    <div class="container">
-        &copy; 2026 EventHub &middot; Event Booking &amp; Management Platform
-    </div>
-</footer>
+<div th:replace="~{fragments/footer :: footer}"></div>
 
 </body>
 </html>

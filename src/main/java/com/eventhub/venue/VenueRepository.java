@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface VenueRepository extends JpaRepository<Venue, UUID>
 {
     List<Venue> findAllByActiveTrueOrderByCreatedAtDesc();
+
+    boolean existsByNameIgnoreCaseAndCityIgnoreCaseAndActiveTrue(String name, String city);
 }
