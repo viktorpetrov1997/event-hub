@@ -17,4 +17,8 @@ public interface EventRepository extends JpaRepository<Event, UUID>
           AND e.endTime > :now""")
     int findMaxUpcomingEventCapacityAtVenue(@Param("venueId") UUID venueId,
                                             @Param("now") LocalDateTime now);
+
+    boolean existsByVenueIdAndEndTimeAfter(UUID venueId, LocalDateTime now);
+
+    boolean existsByVenueId(UUID venueId);
 }

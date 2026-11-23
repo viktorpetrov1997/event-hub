@@ -4,6 +4,7 @@ import com.eventhub.event.EventRepository;
 import com.eventhub.venue.dto.VenueFormRequest;
 import com.eventhub.venue.exception.VenueAlreadyExistsException;
 import com.eventhub.venue.exception.VenueCapacityTooLowException;
+import com.eventhub.venue.exception.VenueIsBeingUsedException;
 import com.eventhub.venue.exception.VenueNotFoundException;
 
 import org.springframework.stereotype.Service;
@@ -76,5 +77,24 @@ public class VenueService
         venue.setCapacity(request.getCapacity());
 
         venueRepository.save(venue);
+    }
+
+    public void deleteVenue(UUID id)
+    {
+        Venue venue = getVenueById(id);
+
+        if(eventRepository.existsByVenueIdAndEndTimeAfter(id, LocalDateTime.now()))
+        {
+            throw new VenueIsBeingUsedException("This venue cannot be deleted because it has upcoming or ongoing events.");
+        }
+
+        if(eventRepository.existsByVenueId(id))
+        {
+            venue.setActive(false);
+            venueRepository.save(venue);
+            return;
+        }
+
+        venueRepository.delete(venue);
     }
 }

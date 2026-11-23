@@ -3,6 +3,7 @@ package com.eventhub.venue;
 import com.eventhub.venue.dto.VenueFormRequest;
 import com.eventhub.venue.exception.VenueAlreadyExistsException;
 import com.eventhub.venue.exception.VenueCapacityTooLowException;
+import com.eventhub.venue.exception.VenueIsBeingUsedException;
 
 import jakarta.validation.Valid;
 
@@ -125,5 +126,22 @@ public class VenueController
         }
 
         return new ModelAndView("redirect:/venues");
+    }
+
+    @DeleteMapping("/venues/{id}")
+    public ModelAndView deleteVenue(@PathVariable UUID id)
+    {
+        try
+        {
+            venueService.deleteVenue(id);
+            return new ModelAndView("redirect:/venues");
+        }
+        catch(VenueIsBeingUsedException ex)
+        {
+            ModelAndView modelAndView = new ModelAndView("venues");
+            modelAndView.addObject("venues", venueService.getAllVenues());
+            modelAndView.addObject("errorMessage", ex.getMessage());
+            return modelAndView;
+        }
     }
 }
