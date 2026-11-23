@@ -1,8 +1,7 @@
 package com.eventhub.event;
 
 import com.eventhub.event.dto.EventFormRequest;
-import com.eventhub.event.exception.EventCapacityExceedsVenueException;
-import com.eventhub.event.exception.VenueAlreadyBookedException;
+import com.eventhub.event.exception.*;
 import com.eventhub.user.User;
 import com.eventhub.user.UserRepository;
 import com.eventhub.user.exception.UserNotFoundException;
@@ -93,6 +92,12 @@ public class EventService
                 .build();
 
         eventRepository.save(event);
+    }
+
+    public Event getEventById(UUID id)
+    {
+        return eventRepository.findById(id)
+                .orElseThrow(() -> new EventNotFoundException("Event not found"));
     }
 
     private void validateVenueConstraints(EventFormRequest request, Venue venue, UUID excludeEventId)

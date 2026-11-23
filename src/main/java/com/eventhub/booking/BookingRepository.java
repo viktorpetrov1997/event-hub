@@ -15,4 +15,8 @@ public interface BookingRepository extends JpaRepository<Booking, UUID>
         WHERE b.event.id = :eventId
       AND b.status <> com.eventhub.booking.BookingStatus.CANCELLED""")
     int sumBookedSeatsByEventId(@Param("eventId") UUID eventId);
+
+    boolean existsByUserIdAndEventIdAndStatus(UUID userId, UUID eventId, BookingStatus status);
+
+    boolean existsByEventIdAndStatusNot(UUID eventId, BookingStatus status);
 }

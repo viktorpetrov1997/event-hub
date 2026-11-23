@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,90 +9,114 @@
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="container">
-
-        <a class="brand" href="#">
-            <span class="brand-mark">E</span>
-            <span>EventHub</span>
-        </a>
-
-        <ul class="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Events</a></li>
-            <li><a href="#">Dashboard</a></li>
-            <li><a href="#">Venues</a></li>
-            <li><a href="#">+ New Event</a></li>
-            <li class="nav-user">
-                <span class="who">user</span>
-
-                <span class="badge badge-primary">ORGANIZER</span>
-
-                <form action="#" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
-                </form>
-            </li>
-        </ul>
-    </div>
-</nav>
+<div th:replace="~{fragments/navbar :: navbar('events')}"></div>
 
 <main>
     <div class="container">
 
-        <p><a href="#">&larr Back to events</a></p>
+        <p><a th:href="@{/events}">&larr; Back to events</a></p>
+
+        <th:block th:replace="~{fragments/alerts :: alerts}"></th:block>
 
         <div class="details-layout">
 
             <section class="card details-main">
                 <div style="margin-bottom:.75rem;">
-                    <span class="badge badge-success">Published</span>
-                    <span class="badge badge-warning">Hidden</span>
-                    <span class="badge badge-danger">Sold out</span>
+                    <span class="badge badge-success" th:if="${isOwner and event.published}">Published</span>
+                    <span class="badge badge-warning" th:if="${isOwner and !event.published}">Hidden</span>
+                    <span class="badge badge-danger" th:if="${availableSeats <= 0}">Sold out</span>
                 </div>
 
-                <h1>Summer Music Festival 2027</h1>
-                <p class="muted">Organized by <strong>user</strong></p>
+                <h1 th:text="${event.title}">Event title</h1>
+                <p class="muted">Organized by <strong th:text="${event.organizer.username}"></strong></p>
 
                 <h3 style="margin-top:1.5rem;">About this event</h3>
-                <p class="description">Enjoy an unforgettable summer night filled with live music, amazing artists, great vibes, and dancing under the stars. Join us for the ultimate summer festival experience!</p>
+                <p class="description" th:text="${event.description}"></p>
 
                 <h3 style="margin-top:1.5rem;">Details</h3>
                 <ul class="info-list">
-                    <li><span class="label">Date</span><span>August 8th 2027</span></li>
-                    <li><span class="label">Starts</span><span>18:00</span></li>
-                    <li><span class="label">Ends</span><span>23:00</span></li>
-                    <li><span class="label">Venue</span><span>Sofia Open Air Festival Grounds</span></li>
-                    <li><span class="label">City</span><span>Sofia</span></li>
-                    <li><span class="label">Address</span><span>Borisova Gradina, bul. Dragan Tsankov, 1164 Sofia, Bulgaria.</span></li>
-                    <li><span class="label">Capacity</span><span>100</span></li>
-                    <li><span class="label">Seats left</span><strong>95</strong></li>
+                    <li><span class="label">Date</span><span style="text-transform: capitalize" th:text="${#temporals.format(event.startTime, 'EEEE, dd MMMM yyyy')}"></span></li>
+                    <li><span class="label">Starts</span><span th:text="${#temporals.format(event.startTime, 'HH:mm')}"></span></li>
+                    <li>
+                        <span class="label">Ends</span>
+                        <span style="text-transform: capitalize" th:text="${event.startTime.toLocalDate() == event.endTime.toLocalDate()
+                            ? #temporals.format(event.endTime, 'HH:mm')
+                            : #temporals.format(event.endTime, 'dd MMMM yyyy, HH:mm')}">
+                        </span>
+                    </li>
+                    <li><span class="label">Venue</span><span th:text="${event.venue.name}"></span></li>
+                    <li><span class="label">City</span><span th:text="${event.venue.city}"></span></li>
+                    <li><span class="label">Address</span><span th:text="${event.venue.address}"></span></li>
+                    <li><span class="label">Capacity</span><span th:text="${event.capacity}"></span></li>
+                    <li><span class="label">Seats left</span><strong th:text="${availableSeats}"></strong></li>
                 </ul>
             </section>
 
             <aside class="card booking-box">
 
-                <span class="price">15.00 €</span>
+                <th:block th:if="${session.user_role == 'ATTENDEE'}">
 
-                <form action="#" method="post">
+                    <span class="price"
+                          th:text="${event.price == 0 ? 'Free' : #numbers.formatDecimal(event.price, 1, 2) + ' €'}">
+                    </span>
 
-                    <div class="form-group">
-                        <label for="seats">Number of seats</label>
-                        <input type="number" id="seats" name="seats" min="1" max="100">
+                    <p class="alert alert-info" th:if="${alreadyBooked}">You have booked this event.</p>
+
+                    <th:block th:with="started=${!event.startTime.isAfter(T(java.time.LocalDateTime).now())}">
+
+                        <p class="muted" th:if="${!alreadyBooked and started}">Booking is closed because this event has already started.</p>
+
+                        <form th:if="${!alreadyBooked and !started and event.published and availableSeats > 0}"
+                              th:action="@{/events/{id}/book(id=${event.id})}"
+                              th:object="${bookingForm}" method="post" novalidate>
+
+                            <div class="form-group" th:classappend="${#fields.hasErrors('seats')} ? 'has-error'">
+                                <label for="seats">Number of seats</label>
+                                <input type="number" id="seats" th:field="*{seats}" min="1" th:max="${availableSeats}">
+                                <div class="error-text" th:if="${#fields.hasErrors('seats')}" th:errors="*{seats}"></div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block">Book now</button>
+
+                        </form>
+
+                        <th:block th:if="${!alreadyBooked and !started and availableSeats <= 0}">
+                            <p class="muted">Sorry, this event is sold out.</p>
+                        </th:block>
+
+                    </th:block>
+
+                </th:block>
+
+                <th:block th:if="${session.user_role == 'ORGANIZER' and isOwner}">
+
+                    <div class="actions" style="flex-direction:column;">
+                        <a th:if="${event.startTime.isAfter(T(java.time.LocalDateTime).now())}"
+                           th:href="@{/events/{id}/edit(id=${event.id}, redirectTo='details')}" class="btn btn-outline btn-block">Edit event</a>
+
+                        <form th:if="${event.endTime.isAfter(T(java.time.LocalDateTime).now())}"
+                              th:action="@{/events/{id}/visibility(id=${event.id})}" th:method="put">
+                            <button type="submit" class="btn btn-secondary btn-block"
+                                    th:text="${event.published} ? 'Hide event' : 'Publish event'">
+                            </button>
+                        </form>
+
+                        <th:block th:if="${!hasActiveBookings}">
+                            <form th:action="@{/events/{id}(id=${event.id})}" th:method="delete"
+                                  onsubmit="return confirm('Are you sure you want to delete this event? This cannot be undone.');">
+                                <button type="submit" class="btn btn-danger btn-block">Delete event</button>
+                            </form>
+                        </th:block>
                     </div>
+                </th:block>
 
-                    <button type="submit" class="btn btn-primary btn-block">Book now</button>
-
-                </form>
+                <p class="muted" th:if="${session.user_role == 'ORGANIZER' and !isOwner}">You can only manage your own events.</p>
             </aside>
         </div>
     </div>
 </main>
 
-<footer class="footer">
-    <div class="container">
-        &copy; 2026 EventHub &middot; Event Booking &amp; Management Platform
-    </div>
-</footer>
+<div th:replace="~{fragments/footer :: footer}"></div>
 
 </body>
 </html>

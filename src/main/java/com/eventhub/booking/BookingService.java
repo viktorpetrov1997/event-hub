@@ -18,4 +18,14 @@ public class BookingService
     {
         return bookingRepository.sumBookedSeatsByEventId(eventId);
     }
+
+    public boolean hasConfirmedBooking(UUID userId, UUID eventId)
+    {
+        return bookingRepository.existsByUserIdAndEventIdAndStatus(userId, eventId, BookingStatus.CONFIRMED);
+    }
+
+    public boolean hasActiveBookings(UUID eventId)
+    {
+        return bookingRepository.existsByEventIdAndStatusNot(eventId, BookingStatus.CANCELLED);
+    }
 }

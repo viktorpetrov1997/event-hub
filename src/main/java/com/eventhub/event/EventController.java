@@ -1,6 +1,7 @@
 package com.eventhub.event;
 
 import com.eventhub.booking.BookingService;
+import com.eventhub.booking.dto.BookingFormRequest;
 import com.eventhub.event.dto.EventFormRequest;
 import com.eventhub.event.exception.EventCapacityExceedsVenueException;
 import com.eventhub.event.exception.VenueAlreadyBookedException;
@@ -11,10 +12,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -119,6 +117,41 @@ public class EventController
         ModelAndView modelAndView = new ModelAndView("event-form");
         modelAndView.addObject("eventForm", eventForm);
         modelAndView.addObject("venues", venueService.getAllVenues());
+        return modelAndView;
+    }
+
+    @GetMapping("/events/{id}")
+    public ModelAndView getEventDetails(@PathVariable UUID id, HttpSession httpSession)
+    {
+        UUID currentUserId = (UUID) httpSession.getAttribute("user_id");
+
+        Event event = eventService.getEventById(id);
+
+        boolean isOwner = event.getOrganizer() != null
+                && event.getOrganizer().getId().equals(currentUserId);
+
+        boolean alreadyBooked = bookingService.hasConfirmedBooking(currentUserId, id);
+
+        if(!event.isPublished() && !isOwner && !alreadyBooked)
+        {
+            return new ModelAndView("redirect:/events");
+        }
+
+        int bookedSeats = bookingService.getBookedSeatsForEvent(id);
+        int availableSeats = event.getCapacity() - bookedSeats;
+
+        boolean hasActiveBookings = bookingService.hasActiveBookings(id);
+
+        BookingFormRequest bookingForm = new BookingFormRequest();
+
+        ModelAndView modelAndView = new ModelAndView("event-details");
+        modelAndView.addObject("event", event);
+        modelAndView.addObject("bookingForm", bookingForm);
+        modelAndView.addObject("isOwner", isOwner);
+        modelAndView.addObject("alreadyBooked", alreadyBooked);
+        modelAndView.addObject("availableSeats", availableSeats);
+        modelAndView.addObject("hasActiveBookings", hasActiveBookings);
+
         return modelAndView;
     }
 }
