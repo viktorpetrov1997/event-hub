@@ -1,14 +1,22 @@
 package com.eventhub.event;
 
 import com.eventhub.booking.BookingService;
+import com.eventhub.event.dto.EventFormRequest;
+import com.eventhub.event.exception.EventCapacityExceedsVenueException;
+import com.eventhub.event.exception.VenueAlreadyBookedException;
 import com.eventhub.venue.VenueService;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +71,54 @@ public class EventController
         modelAndView.addObject("availableSeatsByEvent", availableSeatsByEvent);
         modelAndView.addObject("percentBookedByEvent", percentBookedByEvent);
 
+        return modelAndView;
+    }
+
+    @GetMapping("/event-form")
+    public ModelAndView getEventFormPage()
+    {
+        EventFormRequest eventForm = new EventFormRequest();
+
+        ModelAndView modelAndView = new ModelAndView("event-form");
+        modelAndView.addObject("eventForm", eventForm);
+        modelAndView.addObject("venues", venueService.getAllVenues());
+        return modelAndView;
+    }
+
+    @PostMapping("/events")
+    public ModelAndView createEvent(@Valid @ModelAttribute("eventForm") EventFormRequest eventForm,
+                                    BindingResult bindingResult, HttpSession httpSession, RedirectAttributes redirectAttributes)
+    {
+        if(bindingResult.hasErrors())
+        {
+            ModelAndView modelAndView = new ModelAndView("event-form");
+            modelAndView.addObject("eventForm", eventForm);
+            modelAndView.addObject("venues", venueService.getAllVenues());
+            return modelAndView;
+        }
+
+        UUID organizerId = (UUID) httpSession.getAttribute("user_id");
+
+        try
+        {
+            eventService.createEvent(eventForm, organizerId);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Event created successfully.");
+
+            return new ModelAndView("redirect:/events");
+        }
+        catch(EventCapacityExceedsVenueException ex)
+        {
+            bindingResult.rejectValue("capacity", "event.capacity.exceedsVenue", ex.getMessage());
+        }
+        catch(VenueAlreadyBookedException ex)
+        {
+            bindingResult.rejectValue("venueId", "event.venue.alreadyBooked", ex.getMessage());
+        }
+
+        ModelAndView modelAndView = new ModelAndView("event-form");
+        modelAndView.addObject("eventForm", eventForm);
+        modelAndView.addObject("venues", venueService.getAllVenues());
         return modelAndView;
     }
 }

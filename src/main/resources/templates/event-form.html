@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,100 +9,98 @@
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="container">
-
-        <a class="brand" href="#">
-            <span class="brand-mark">E</span>
-            <span>EventHub</span>
-        </a>
-
-        <ul class="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Events</a></li>
-            <li><a href="#">Dashboard</a></li>
-            <li><a href="#">Venues</a></li>
-            <li><a href="#">+ New Event</a></li>
-            <li class="nav-user">
-                <span class="who">user</span>
-
-                <span class="badge badge-primary">ORGANIZER</span>
-
-                <form action="#" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
-                </form>
-            </li>
-        </ul>
-    </div>
-</nav>
+<div th:replace="~{fragments/navbar :: navbar(${eventId == null ? 'event-form' : ''})}"></div>
 
 <main>
     <div class="container">
 
         <div class="card form-card">
 
-            <h1>Create a new event</h1>
+            <h1 th:text="${eventId == null} ? 'Create a new event' : 'Edit event'"></h1>
 
-            <form action="#" method="post">
+            <form th:action="${eventId == null} ? @{/events} : @{/events/{id}(id=${eventId})}"
+                  th:method="${eventId == null} ? 'post' : 'put'"
+                  th:object="${eventForm}" novalidate>
 
-                <div class="form-group">
+                <input type="hidden" name="redirectTo" th:value="${redirectTo}">
+
+                <div class="form-group" th:classappend="${#fields.hasErrors('title')} ? 'has-error'">
                     <label for="title">Title</label>
-                    <input type="text" id="title" name="title" placeholder="e.g. Web Development Hackathon 2027">
+                    <input type="text" id="title" th:field="*{title}" placeholder="e.g. Tech & Innovation Summit">
+                    <div class="error-text" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" th:classappend="${#fields.hasErrors('description')} ? 'has-error'">
                     <label for="description">Description</label>
-                    <textarea id="description" name="description" placeholder="What will attendees learn or experience?"></textarea>
+                    <textarea id="description" th:field="*{description}" placeholder="What will attendees learn or experience?"></textarea>
+                    <div class="error-text" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group">
+                    <div class="form-group" th:classappend="${#fields.hasErrors('startTime')} ? 'has-error'">
                         <label for="startTime">Starts</label>
-                        <input type="datetime-local" id="startTime" name="startTime">
+                        <input type="datetime-local" id="startTime" th:field="*{startTime}">
+                        <div class="error-text" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" th:classappend="${#fields.hasErrors('endTime') or #fields.hasErrors('endTimeAfterStartTime')} ? 'has-error'">
                         <label for="endTime">Ends</label>
-                        <input type="datetime-local" id="endTime" name="endTime">
+                        <input type="datetime-local" id="endTime" th:field="*{endTime}">
+                        <div class="error-text" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}"></div>
+                        <div class="error-text" th:if="${#fields.hasErrors('endTimeAfterStartTime')}" th:errors="*{endTimeAfterStartTime}"></div>
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" th:classappend="${#fields.hasErrors('venueId')} ? 'has-error'">
 
                     <label for="venueId">Venue</label>
 
-                    <select id="venueId" name="venueId">
+                    <select id="venueId" th:field="*{venueId}">
                         <option value="">-- Select a venue --</option>
-                        <option value="1">Sofia Open Air Festival Grounds – Sofia (capacity 100)</option>
+                        <option th:each="venue : ${venues}" th:value="${venue.id}"
+                                th:text="${venue.name + ' – ' + venue.city + ' (capacity ' + venue.capacity + ')'}">
+                        </option>
                     </select>
+
+                    <div class="hint" th:if="${#lists.isEmpty(venues)}">
+                        There are no venues yet.
+                        <a th:href="@{/venue-form}">Create a venue</a> first, then come back to create your event.
+                    </div>
+
+                    <div class="hint" th:unless="${#lists.isEmpty(venues)}">A venue can host only one event at a time.</div>
+
+                    <div class="error-text" th:if="${#fields.hasErrors('venueId')}" th:errors="*{venueId}"></div>
 
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group">
+                    <div class="form-group" th:classappend="${#fields.hasErrors('price')} ? 'has-error'">
                         <label for="price">Price (€)</label>
-                        <input type="number" id="price" name="price" step="1" min="0" placeholder="0.00">
+                        <input type="number" id="price" th:field="*{price}" step="1" min="0" placeholder="0.00">
                         <div class="hint">Use 0 for a free event.</div>
+                        <div class="error-text" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" th:classappend="${#fields.hasErrors('capacity')} ? 'has-error'">
                         <label for="capacity">Capacity (seats)</label>
-                        <input type="number" id="capacity" name="capacity" step="1" min="1" placeholder="e.g. 50">
+                        <input type="number" id="capacity" th:field="*{capacity}" step="1" min="1" placeholder="e.g. 50">
                         <div class="hint">Cannot exceed the venue capacity.</div>
+                        <div class="error-text" th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}"></div>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label style="display:flex;align-items:center;gap:.5rem;font-weight:500;">
-                        <input type="checkbox" name="published" style="width:auto;" checked>
+                        <input type="checkbox" th:field="*{published}" style="width:auto;" checked>
                         Publish immediately (visible to attendees)
                     </label>
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Create event</button>
+                    <button type="submit" class="btn btn-primary"
+                            th:text="${eventId == null} ? 'Create event' : 'Save changes'"></button>
 
-                    <a href="#" class="btn btn-secondary">Cancel</a>
+                    <a th:href="@{/events}" class="btn btn-secondary">Cancel</a>
                 </div>
 
             </form>
@@ -110,11 +108,7 @@
     </div>
 </main>
 
-<footer class="footer">
-    <div class="container">
-        &copy; 2026 EventHub &middot; Event Booking &amp; Management Platform
-    </div>
-</footer>
+<div th:replace="~{fragments/footer :: footer}"></div>
 
 </body>
 </html>
