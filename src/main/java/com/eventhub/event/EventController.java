@@ -3,6 +3,8 @@ package com.eventhub.event;
 import com.eventhub.booking.BookingService;
 import com.eventhub.booking.dto.BookingFormRequest;
 import com.eventhub.event.dto.EventFormRequest;
+import com.eventhub.event.exception.EventAlreadyStartedException;
+import com.eventhub.event.exception.EventCapacityBelowBookedSeatsException;
 import com.eventhub.event.exception.EventCapacityExceedsVenueException;
 import com.eventhub.event.exception.VenueAlreadyBookedException;
 import com.eventhub.venue.VenueService;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -152,6 +155,121 @@ public class EventController
         modelAndView.addObject("availableSeats", availableSeats);
         modelAndView.addObject("hasActiveBookings", hasActiveBookings);
 
+        return modelAndView;
+    }
+
+    @GetMapping("/events/{id}/edit")
+    public ModelAndView getEventEditPage(@PathVariable UUID id,
+                                         @RequestParam(defaultValue = "details") String redirectTo,
+                                         HttpSession httpSession,
+                                         RedirectAttributes redirectAttributes)
+    {
+        Event event = eventService.getEventById(id);
+
+        UUID currentUserId = (UUID) httpSession.getAttribute("user_id");
+
+        boolean isOwner = event.getOrganizer() != null
+                && event.getOrganizer().getId().equals(currentUserId);
+
+        if(!isOwner)
+        {
+            return new ModelAndView("redirect:/events");
+        }
+
+        if(!event.getStartTime().isAfter(LocalDateTime.now()))
+        {
+            redirectAttributes.addFlashAttribute("errorMessage", "This event has already started and can no longer be edited.");
+
+            return new ModelAndView("redirect:/events/" + id);
+        }
+
+        EventFormRequest eventForm = new EventFormRequest();
+
+        eventForm.setTitle(event.getTitle());
+        eventForm.setDescription(event.getDescription());
+        eventForm.setStartTime(event.getStartTime());
+        eventForm.setEndTime(event.getEndTime());
+        eventForm.setPrice(event.getPrice());
+        eventForm.setCapacity(event.getCapacity());
+        eventForm.setPublished(event.isPublished());
+        eventForm.setVenueId(event.getVenue().getId());
+
+        ModelAndView modelAndView = new ModelAndView("event-form");
+        modelAndView.addObject("eventForm", eventForm);
+        modelAndView.addObject("eventId", id);
+        modelAndView.addObject("redirectTo", redirectTo);
+        modelAndView.addObject("venues", venueService.getAllVenues());
+        return modelAndView;
+    }
+
+    @PutMapping("/events/{id}")
+    public ModelAndView updateEvent(@PathVariable UUID id,
+                                    @Valid @ModelAttribute("eventForm") EventFormRequest eventForm,
+                                    BindingResult bindingResult,
+                                    HttpSession httpSession,
+                                    @RequestParam(defaultValue = "details") String redirectTo,
+                                    RedirectAttributes redirectAttributes)
+    {
+        UUID currentUserId = (UUID) httpSession.getAttribute("user_id");
+
+        Event event = eventService.getEventById(id);
+
+        if(!event.getOrganizer().getId().equals(currentUserId))
+        {
+            return new ModelAndView("redirect:/events");
+        }
+
+        if(!event.getStartTime().isAfter(LocalDateTime.now()))
+        {
+            redirectAttributes.addFlashAttribute("errorMessage", "This event has already started and can no longer be edited.");
+
+            return new ModelAndView("redirect:/events/" + id);
+        }
+
+        if(bindingResult.hasErrors())
+        {
+            ModelAndView modelAndView = new ModelAndView("event-form");
+            modelAndView.addObject("eventForm", eventForm);
+            modelAndView.addObject("eventId", id);
+            modelAndView.addObject("redirectTo", redirectTo);
+            modelAndView.addObject("venues", venueService.getAllVenues());
+            return modelAndView;
+        }
+
+        try
+        {
+            eventService.updateEvent(id, eventForm);
+
+            if(redirectTo.equals("dashboard"))
+            {
+                return new ModelAndView("redirect:/dashboard");
+            }
+
+            return new ModelAndView("redirect:/events/" + id);
+        }
+        catch(EventAlreadyStartedException ex)
+        {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            return new ModelAndView("redirect:/events/" + id);
+        }
+        catch(EventCapacityExceedsVenueException ex)
+        {
+            bindingResult.rejectValue("capacity", "event.capacity.exceedsVenue", ex.getMessage());
+        }
+        catch(VenueAlreadyBookedException ex)
+        {
+            bindingResult.rejectValue("venueId", "event.venue.alreadyBooked", ex.getMessage());
+        }
+        catch(EventCapacityBelowBookedSeatsException ex)
+        {
+            bindingResult.rejectValue("capacity", "event.capacity.belowBooked", ex.getMessage());
+        }
+
+        ModelAndView modelAndView = new ModelAndView("event-form");
+        modelAndView.addObject("eventForm", eventForm);
+        modelAndView.addObject("eventId", id);
+        modelAndView.addObject("redirectTo", redirectTo);
+        modelAndView.addObject("venues", venueService.getAllVenues());
         return modelAndView;
     }
 }
