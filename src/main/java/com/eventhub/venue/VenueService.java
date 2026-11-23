@@ -1,19 +1,27 @@
 package com.eventhub.venue;
 
+import com.eventhub.event.EventRepository;
 import com.eventhub.venue.dto.VenueFormRequest;
 import com.eventhub.venue.exception.VenueAlreadyExistsException;
+import com.eventhub.venue.exception.VenueCapacityTooLowException;
+import com.eventhub.venue.exception.VenueNotFoundException;
+
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class VenueService
 {
     private final VenueRepository venueRepository;
+    private final EventRepository eventRepository;
 
-    public VenueService(VenueRepository venueRepository)
+    public VenueService(VenueRepository venueRepository, EventRepository eventRepository)
     {
         this.venueRepository = venueRepository;
+        this.eventRepository = eventRepository;
     }
 
     public List<Venue> getAllVenues()
@@ -34,6 +42,38 @@ public class VenueService
                 .address(request.getAddress())
                 .capacity(request.getCapacity())
                 .build();
+
+        venueRepository.save(venue);
+    }
+
+    public Venue getVenueById(UUID id)
+    {
+        return venueRepository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> new VenueNotFoundException("Venue not found"));
+    }
+
+    public void updateVenue(UUID id, VenueFormRequest request)
+    {
+        Venue venue = getVenueById(id);
+
+        if(venueRepository.existsByNameIgnoreCaseAndCityIgnoreCaseAndActiveTrueAndIdNot(request.getName(), request.getCity(), id))
+        {
+            throw new VenueAlreadyExistsException("A venue with this name already exists in this city.");
+        }
+
+        int requiredCapacity = eventRepository.findMaxUpcomingEventCapacityAtVenue(id, LocalDateTime.now());
+
+        if(request.getCapacity() < requiredCapacity)
+        {
+            throw new VenueCapacityTooLowException(
+                    "Capacity cannot be lower than " + requiredCapacity
+                            + " because an upcoming event at this venue has that many seats.");
+        }
+
+        venue.setName(request.getName());
+        venue.setCity(request.getCity());
+        venue.setAddress(request.getAddress());
+        venue.setCapacity(request.getCapacity());
 
         venueRepository.save(venue);
     }
