@@ -1,8 +1,7 @@
 package com.eventhub.booking;
 
 import com.eventhub.booking.dto.BookingFormRequest;
-import com.eventhub.booking.exception.BookingNotAllowedException;
-import com.eventhub.booking.exception.NotEnoughSeatsException;
+import com.eventhub.booking.exception.*;
 import com.eventhub.event.Event;
 import com.eventhub.event.EventRepository;
 import com.eventhub.event.exception.EventNotFoundException;
@@ -85,6 +84,31 @@ public class BookingService
                 .event(event)
                 .user(user)
                 .build();
+
+        bookingRepository.save(booking);
+    }
+
+    public void cancelBooking(UUID bookingId, UUID userId)
+    {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new BookingNotFoundException("Booking not found"));
+
+        if(!booking.getUser().getId().equals(userId))
+        {
+            throw new BookingAccessDeniedException("You cannot cancel someone else's booking.");
+        }
+
+        if(booking.getStatus() != BookingStatus.CONFIRMED)
+        {
+            throw new BookingCancellationNotAllowedException("Only confirmed bookings can be cancelled.");
+        }
+
+        if(!booking.getEvent().getStartTime().isAfter(LocalDateTime.now()))
+        {
+            throw new BookingCancellationNotAllowedException("This event has already started and can no longer be cancelled.");
+        }
+
+        booking.setStatus(BookingStatus.CANCELLED);
 
         bookingRepository.save(booking);
     }

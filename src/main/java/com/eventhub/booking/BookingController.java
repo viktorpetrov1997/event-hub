@@ -1,6 +1,8 @@
 package com.eventhub.booking;
 
 import com.eventhub.booking.dto.BookingFormRequest;
+import com.eventhub.booking.exception.BookingAccessDeniedException;
+import com.eventhub.booking.exception.BookingCancellationNotAllowedException;
 import com.eventhub.booking.exception.BookingNotAllowedException;
 import com.eventhub.booking.exception.NotEnoughSeatsException;
 import com.eventhub.event.Event;
@@ -11,10 +13,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -92,5 +91,24 @@ public class BookingController
         modelAndView.addObject("availableSeats", event.getCapacity() - bookingService.getBookedSeatsForEvent(eventId));
         modelAndView.addObject("hasActiveBookings", bookingService.hasActiveBookings(eventId));
         return modelAndView;
+    }
+
+    @PutMapping("/bookings/{id}/cancel")
+    public ModelAndView cancelBooking(@PathVariable UUID id, HttpSession httpSession,
+                                      RedirectAttributes redirectAttributes)
+    {
+        UUID userId = (UUID) httpSession.getAttribute("user_id");
+
+        try
+        {
+            bookingService.cancelBooking(id, userId);
+            redirectAttributes.addFlashAttribute("successMessage", "Your booking has been canceled.");
+        }
+        catch(BookingAccessDeniedException | BookingCancellationNotAllowedException ex)
+        {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+
+        return new ModelAndView("redirect:/my-bookings");
     }
 }
