@@ -5,8 +5,8 @@ import com.eventhub.user.dto.UserLoginRequest;
 import com.eventhub.user.dto.UserRegisterRequest;
 import com.eventhub.user.exception.InvalidLoginException;
 import com.eventhub.user.exception.UserAlreadyExistsException;
-
 import com.eventhub.user.exception.UserNotFoundException;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

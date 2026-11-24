@@ -1,6 +1,7 @@
 package com.eventhub.user;
 
 import jakarta.persistence.*;
+
 import lombok.*;
 
 import java.util.UUID;
