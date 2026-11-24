@@ -1,9 +1,21 @@
 package com.eventhub.booking;
 
+import com.eventhub.booking.dto.BookingFormRequest;
+import com.eventhub.booking.exception.BookingNotAllowedException;
+import com.eventhub.booking.exception.NotEnoughSeatsException;
+import com.eventhub.event.Event;
+import com.eventhub.event.EventRepository;
+import com.eventhub.event.exception.EventNotFoundException;
+import com.eventhub.user.User;
+import com.eventhub.user.UserRepository;
+import com.eventhub.user.UserRole;
+import com.eventhub.user.exception.UserNotFoundException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,15 +23,70 @@ import java.util.UUID;
 public class BookingService
 {
     private final BookingRepository bookingRepository;
+    private final EventRepository eventRepository;
+    private final UserRepository userRepository;
 
-    public BookingService(BookingRepository bookingRepository)
+    public BookingService(BookingRepository bookingRepository, EventRepository eventRepository, UserRepository userRepository)
     {
         this.bookingRepository = bookingRepository;
+        this.eventRepository = eventRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Booking> getBookingsForUser(UUID userId)
     {
         return bookingRepository.findByUserIdOrderByCreatedAtDesc(userId);
+    }
+
+    public void createBooking(UUID userId, UUID eventId, BookingFormRequest request)
+    {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Event not found"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if(user.getRole() != UserRole.ATTENDEE)
+        {
+            throw new BookingNotAllowedException("Only attendees can book events.");
+        }
+
+        if(!event.isPublished())
+        {
+            throw new BookingNotAllowedException("This event is not available for booking.");
+        }
+
+        if(!event.getStartTime().isAfter(LocalDateTime.now()))
+        {
+            throw new BookingNotAllowedException("Your booking was not completed because the event has just started.");
+        }
+
+        if(hasConfirmedBooking(userId, eventId))
+        {
+            throw new BookingNotAllowedException("You have already booked this event.");
+        }
+
+        int requestedSeats = request.getSeats();
+
+        int bookedSeats = getBookedSeatsForEvent(eventId);
+        int availableSeats = event.getCapacity() - bookedSeats;
+
+        if(requestedSeats > availableSeats)
+        {
+            throw new NotEnoughSeatsException(availableSeats <= 0
+                    ? "This event is sold out."
+                    : "Only " + availableSeats + " seat(s) left.");
+        }
+
+        Booking booking = Booking.builder()
+                .seats(requestedSeats)
+                .totalPrice(event.getPrice().multiply(BigDecimal.valueOf(requestedSeats)))
+                .status(BookingStatus.CONFIRMED)
+                .event(event)
+                .user(user)
+                .build();
+
+        bookingRepository.save(booking);
     }
 
     public int getBookedSeatsForEvent(UUID eventId)
