@@ -68,7 +68,7 @@ public class VenueService
         {
             throw new VenueCapacityTooLowException(
                     "Capacity cannot be lower than " + requiredCapacity
-                            + " because an upcoming event at this venue has that many seats.");
+                            + " because an upcoming or ongoing event at this venue has that many seats.");
         }
 
         venue.setName(request.getName());
