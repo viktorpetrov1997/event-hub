@@ -3,10 +3,7 @@ package com.eventhub.event;
 import com.eventhub.booking.BookingService;
 import com.eventhub.booking.dto.BookingFormRequest;
 import com.eventhub.event.dto.EventFormRequest;
-import com.eventhub.event.exception.EventAlreadyStartedException;
-import com.eventhub.event.exception.EventCapacityBelowBookedSeatsException;
-import com.eventhub.event.exception.EventCapacityExceedsVenueException;
-import com.eventhub.event.exception.VenueAlreadyBookedException;
+import com.eventhub.event.exception.*;
 import com.eventhub.venue.VenueService;
 
 import jakarta.servlet.http.HttpSession;
@@ -271,5 +268,43 @@ public class EventController
         modelAndView.addObject("redirectTo", redirectTo);
         modelAndView.addObject("venues", venueService.getAllVenues());
         return modelAndView;
+    }
+
+    @PutMapping("/events/{id}/visibility")
+    public ModelAndView toggleEventVisibility(@PathVariable UUID id,
+                                              HttpSession httpSession,
+                                              RedirectAttributes redirectAttributes,
+                                              @RequestParam(defaultValue = "details") String redirectTo)
+    {
+        UUID currentUserId = (UUID) httpSession.getAttribute("user_id");
+
+        Event event = eventService.getEventById(id);
+
+        if(!event.getOrganizer().getId().equals(currentUserId))
+        {
+            return new ModelAndView("redirect:/events");
+        }
+
+        try
+        {
+            eventService.togglePublished(id);
+
+            String message = eventService.getEventById(id).isPublished()
+                    ? "Event published successfully."
+                    : "Event hidden successfully.";
+
+            redirectAttributes.addFlashAttribute("successMessage", message);
+        }
+        catch(EventAlreadyEndedException ex)
+        {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+
+        if(redirectTo.equals("dashboard"))
+        {
+            return new ModelAndView("redirect:/dashboard");
+        }
+
+        return new ModelAndView("redirect:/events/" + id);
     }
 }

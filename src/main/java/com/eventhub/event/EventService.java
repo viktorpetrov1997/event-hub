@@ -158,4 +158,18 @@ public class EventService
                             + conflict.getEndTime().format(DATE_TIME_FORMAT) + ".");
         }
     }
+
+    public void togglePublished(UUID id)
+    {
+        Event event = getEventById(id);
+
+        if(!event.getEndTime().isAfter(LocalDateTime.now()))
+        {
+            throw new EventAlreadyEndedException("You cannot change the visibility of an event that has already ended.");
+        }
+
+        event.setPublished(!event.isPublished());
+
+        eventRepository.save(event);
+    }
 }
