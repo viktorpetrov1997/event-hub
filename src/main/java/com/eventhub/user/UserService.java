@@ -6,10 +6,12 @@ import com.eventhub.user.dto.UserRegisterRequest;
 import com.eventhub.user.exception.InvalidLoginException;
 import com.eventhub.user.exception.UserAlreadyExistsException;
 
+import com.eventhub.user.exception.UserNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService
@@ -52,5 +54,13 @@ public class UserService
         }
 
         return UserMapper.toUserDto(optionalUser.get());
+    }
+
+    public UserDto getById(UUID id)
+    {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        return UserMapper.toUserDto(user);
     }
 }
