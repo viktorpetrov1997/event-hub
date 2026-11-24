@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -14,6 +15,11 @@ public class BookingService
     public BookingService(BookingRepository bookingRepository)
     {
         this.bookingRepository = bookingRepository;
+    }
+
+    public List<Booking> getBookingsForUser(UUID userId)
+    {
+        return bookingRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
     public int getBookedSeatsForEvent(UUID eventId)

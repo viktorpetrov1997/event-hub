@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,30 +9,7 @@
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="container">
-
-        <a class="brand" href="#">
-            <span class="brand-mark">E</span>
-            <span>EventHub</span>
-        </a>
-
-        <ul class="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Events</a></li>
-            <li><a href="#">My Bookings</a></li>
-            <li class="nav-user">
-                <span class="who">user</span>
-
-                <span class="badge badge-primary">ATTENDEE</span>
-
-                <form action="#" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
-                </form>
-            </li>
-        </ul>
-    </div>
-</nav>
+<div th:replace="~{fragments/navbar :: navbar('my-bookings')}"></div>
 
 <main>
     <div class="container">
@@ -42,10 +19,12 @@
                 <h1>My bookings</h1>
                 <p>All the events you have reserved seats for.</p>
             </div>
-            <a href="#" class="btn btn-primary">Browse events</a>
+            <a th:href="@{/events}" class="btn btn-primary">Browse events</a>
         </div>
 
-        <div class="table-wrap">
+        <th:block th:replace="~{fragments/alerts :: alerts}"></th:block>
+
+        <div class="table-wrap" th:if="${!#lists.isEmpty(bookings)}">
             <table>
                 <thead>
                 <tr>
@@ -58,24 +37,30 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td><a href="#">Summer Music Festival 2027</a></td>
+                <tr th:each="booking : ${bookings}">
+                    <td><a th:href="@{/events/{id}(id=${booking.event.id})}" th:text="${booking.event.title}"></a></td>
 
-                    <td>August 8th 2027, 18:00</td>
+                    <td style="text-transform: capitalize" th:text="${#temporals.format(booking.event.startTime, 'dd MMMM yyyy, HH:mm')}"></td>
 
-                    <td>2</td>
+                    <td th:text="${booking.seats}"></td>
 
-                    <td>75.00 €</td>
+                    <td th:text="${booking.totalPrice == 0} ? 'Free' : ${#numbers.formatDecimal(booking.totalPrice, 1, 2)} + ' €'"></td>
 
                     <td>
-                        <span class="badge badge-success">CONFIRMED</span>
+                        <span class="badge"
+                              th:classappend="${booking.status.name() == 'CONFIRMED'} ? 'badge-success' : 'badge-danger'"
+                              th:text="${booking.status}">
+                        </span>
                     </td>
 
                     <td>
                         <div class="actions">
-                            <a href="#" class="btn btn-secondary btn-sm">View</a>
+                            <a th:href="@{/events/{id}(id=${booking.event.id})}" class="btn btn-secondary btn-sm">View</a>
 
-                            <form action="#" method="put" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                            <form th:if="${booking.user.id == session.user_id and booking.status.name() == 'CONFIRMED'
+                                    and booking.event.startTime.isAfter(T(java.time.LocalDateTime).now())}"
+                                    th:action="@{/bookings/{id}/cancel(id=${booking.id})}"
+                                    th:method="put" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
 
                                 <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
                             </form>
@@ -86,14 +71,17 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="empty-state" th:if="${#lists.isEmpty(bookings)}">
+            <h3>No bookings yet</h3>
+            <p>When you book an event it will show up here.</p>
+            <a th:href="@{/events}" class="btn btn-primary">Find an event</a>
+        </div>
+
     </div>
 </main>
 
-<footer class="footer">
-    <div class="container">
-        &copy; 2026 EventHub &middot; Event Booking &amp; Management Platform
-    </div>
-</footer>
+<div th:replace="~{fragments/footer :: footer}"></div>
 
 </body>
 </html>
