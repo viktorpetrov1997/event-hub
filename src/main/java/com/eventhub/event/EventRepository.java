@@ -16,6 +16,8 @@ public interface EventRepository extends JpaRepository<Event, UUID>
 
     List<Event> findAllByOrganizerIdAndEndTimeAfter(UUID organizerId, LocalDateTime now);
 
+    List<Event> findAllByOrganizerIdOrderByStartTimeAsc(UUID organizerId);
+
     @Query("""
         SELECT e FROM Event e
         WHERE e.venue.id = :venueId

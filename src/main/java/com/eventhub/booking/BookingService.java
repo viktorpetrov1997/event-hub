@@ -3,6 +3,7 @@ package com.eventhub.booking;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -34,5 +35,10 @@ public class BookingService
     public void deleteAllBookingsForEvent(UUID eventId)
     {
         bookingRepository.deleteAllByEventId(eventId);
+    }
+
+    public BigDecimal getRevenueForOrganizer(UUID organizerId)
+    {
+        return bookingRepository.sumRevenueByOrganizerId(organizerId);
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -348,5 +349,48 @@ public class EventController
         }
 
         return new ModelAndView("redirect:/events");
+    }
+
+    @GetMapping("/dashboard")
+    public ModelAndView getDashboard(HttpSession httpSession)
+    {
+        UUID organizerId = (UUID) httpSession.getAttribute("user_id");
+
+        List<Event> events = eventService.getOrganizerEvents(organizerId);
+
+        Map<UUID, Integer> bookedSeatsByEvent = new HashMap<>();
+        Map<UUID, Boolean> hasActiveBookingsByEvent = new HashMap<>();
+
+        for(Event event : events)
+        {
+            int bookedSeats = bookingService.getBookedSeatsForEvent(event.getId());
+            bookedSeatsByEvent.put(event.getId(), bookedSeats);
+
+            boolean hasActiveBookings = bookingService.hasActiveBookings(event.getId());
+            hasActiveBookingsByEvent.put(event.getId(), hasActiveBookings);
+        }
+
+        int totalEvents = events.size();
+
+        long publishedEvents = events.stream()
+                .filter(Event::isPublished)
+                .count();
+
+        int soldSeats = bookedSeatsByEvent.values().stream()
+                .mapToInt(Integer::intValue)
+                .sum();
+
+        BigDecimal revenue = bookingService.getRevenueForOrganizer(organizerId);
+
+        ModelAndView modelAndView = new ModelAndView("dashboard");
+        modelAndView.addObject("events", events);
+        modelAndView.addObject("bookedSeatsByEvent", bookedSeatsByEvent);
+        modelAndView.addObject("hasActiveBookingsByEvent", hasActiveBookingsByEvent);
+        modelAndView.addObject("totalEvents", totalEvents);
+        modelAndView.addObject("publishedEvents", publishedEvents);
+        modelAndView.addObject("soldSeats", soldSeats);
+        modelAndView.addObject("revenue", revenue);
+
+        return modelAndView;
     }
 }

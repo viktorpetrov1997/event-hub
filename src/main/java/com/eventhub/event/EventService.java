@@ -188,4 +188,9 @@ public class EventService
 
         eventRepository.delete(event);
     }
+
+    public List<Event> getOrganizerEvents(UUID organizerId)
+    {
+        return eventRepository.findAllByOrganizerIdOrderByStartTimeAsc(organizerId);
+    }
 }
