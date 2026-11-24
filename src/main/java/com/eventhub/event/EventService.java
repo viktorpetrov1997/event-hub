@@ -11,6 +11,7 @@ import com.eventhub.venue.VenueRepository;
 import com.eventhub.venue.exception.VenueNotFoundException;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -171,5 +172,20 @@ public class EventService
         event.setPublished(!event.isPublished());
 
         eventRepository.save(event);
+    }
+
+    @Transactional
+    public void deleteEvent(UUID id)
+    {
+        Event event = getEventById(id);
+
+        if(bookingService.hasActiveBookings(id))
+        {
+            throw new EventHasActiveBookingsException("An event with active bookings cannot be deleted.");
+        }
+
+        bookingService.deleteAllBookingsForEvent(id);
+
+        eventRepository.delete(event);
     }
 }

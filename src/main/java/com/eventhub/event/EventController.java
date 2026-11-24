@@ -307,4 +307,46 @@ public class EventController
 
         return new ModelAndView("redirect:/events/" + id);
     }
+
+    @DeleteMapping("/events/{id}")
+    public ModelAndView deleteEvent(@PathVariable UUID id,
+                                    HttpSession httpSession,
+                                    @RequestParam(defaultValue = "events") String redirectTo,
+                                    RedirectAttributes redirectAttributes)
+    {
+        UUID currentUserId = (UUID) httpSession.getAttribute("user_id");
+
+        Event event = eventService.getEventById(id);
+
+        if(!event.getOrganizer().getId().equals(currentUserId))
+        {
+            return new ModelAndView("redirect:/events");
+        }
+
+        try
+        {
+            eventService.deleteEvent(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Event deleted successfully.");
+        }
+        catch(EventHasActiveBookingsException ex)
+        {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+
+            if(redirectTo.equals("dashboard"))
+            {
+                return new ModelAndView("redirect:/dashboard");
+            }
+            else
+            {
+                return new ModelAndView("redirect:/events/" + id);
+            }
+        }
+
+        if(redirectTo.equals("dashboard"))
+        {
+            return new ModelAndView("redirect:/dashboard");
+        }
+
+        return new ModelAndView("redirect:/events");
+    }
 }

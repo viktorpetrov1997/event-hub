@@ -19,4 +19,6 @@ public interface BookingRepository extends JpaRepository<Booking, UUID>
     boolean existsByUserIdAndEventIdAndStatus(UUID userId, UUID eventId, BookingStatus status);
 
     boolean existsByEventIdAndStatusNot(UUID eventId, BookingStatus status);
+
+    void deleteAllByEventId(UUID eventId);
 }

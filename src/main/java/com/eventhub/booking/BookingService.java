@@ -1,6 +1,7 @@
 package com.eventhub.booking;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -27,5 +28,11 @@ public class BookingService
     public boolean hasActiveBookings(UUID eventId)
     {
         return bookingRepository.existsByEventIdAndStatusNot(eventId, BookingStatus.CANCELLED);
+    }
+
+    @Transactional
+    public void deleteAllBookingsForEvent(UUID eventId)
+    {
+        bookingRepository.deleteAllByEventId(eventId);
     }
 }
